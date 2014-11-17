@@ -6,7 +6,7 @@
 #include <signal.h>
 #include "threadsalive.h"
 
-#define DATALEN 2
+#define DATALEN 1
 #define DURATION 3
 
 tasem_t readersem;
@@ -20,7 +20,7 @@ int *data = NULL;
 int datalen = 0;
 int stop = 0;
 
-void killerthr(void *arg)
+/*void killerthr(void *arg)
 {
     time_t now = time(NULL);
     time_t finish = now + DURATION;
@@ -31,12 +31,12 @@ void killerthr(void *arg)
     }
     stop = 1;
 }
-
+*/
 void reader(void *arg)
 {
     int tid = (int)arg;
     int val = 0;
-    while (!stop) {
+    //while (!stop) {
         ta_sem_wait(&readersem);
         ta_lock(&rmutex);
         int loc = readerloc;
@@ -46,9 +46,9 @@ void reader(void *arg)
         ta_sem_post(&writersem);
         fprintf(stderr, "reader %d read location %d\n", tid, loc);
 
-        if (random() % 2 == 0)
-            ta_yield();
-    }
+       // if (random() % 2 == 0){}
+            //ta_yield();
+    //}
 }
 
 void writer(void *arg)
@@ -56,7 +56,7 @@ void writer(void *arg)
     int tid = (int)arg;
     int val = 1000000;
     int writerloc = 0;
-    while (!stop) {
+   // while (!stop) {
 		
         ta_sem_wait(&writersem);
 
@@ -69,9 +69,10 @@ void writer(void *arg)
         ta_sem_post(&readersem);
         fprintf(stderr, "writer %d wrote location %d\n", tid, loc);
 
-        if (random() % 2 == 0)
-            ta_yield();
-    }
+        //if (random() % 2 == 0){}
+      //      ta_yield();
+    //}
+	
 }
 
 int main(int argc, char **argv)
@@ -82,7 +83,7 @@ int main(int argc, char **argv)
 
     ta_libinit();
     int i = 0;
-    int nrw = 2;
+    int nrw = 1;
 
     data = (int *)malloc(sizeof(int) * DATALEN);
     assert(data);
@@ -96,11 +97,12 @@ int main(int argc, char **argv)
 	
 	
 
-    ta_create(killerthr, (void *)i);
+    //ta_create(killerthr, (void *)i);
 
     for (i = 0; i < nrw; i++) {
         ta_create(reader, (void *)i);
         ta_create(writer, (void *)i);
+		
     }
 
     int rv = ta_waitall();

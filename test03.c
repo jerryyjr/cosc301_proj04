@@ -15,7 +15,7 @@
 
 talock_t mutex;
 tacond_t condv;
-int value = 0;
+int value = 10;
 
 void thread1(void *v)
 {
@@ -23,7 +23,7 @@ void thread1(void *v)
 
     ta_lock(&mutex);
     ta_yield();
-    while (value == 0)
+    while (value--)
     {
         fprintf(stderr, "thread1 going into cond_wait()\n");
         ta_wait(&mutex, &condv);

@@ -27,7 +27,8 @@ int main(int argc, char **argv)
 
     ta_libinit();
     int i = 0;
-    for (i = 0; i < 2; i++) {
+    for (i = 0; i < 50; i++) {
+		
         ta_create(thread1, (void *)&i);
         ta_create(thread2, (void *)&i);
     }

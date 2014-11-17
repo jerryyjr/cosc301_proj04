@@ -4,28 +4,21 @@
 
 #ifndef __THREADSALIVE_H__
 #define __THREADSALIVE_H__
-#include<ucontext.h>
+
 /* ***************************
         type definitions
    *************************** */
-struct node{
-	ucontext_t *thd;
-	struct node *next;
-};
-
 
 typedef struct {
-	struct node *block;
-	int num;
+
 } tasem_t;
 
 typedef struct {
-	tasem_t *sem;
+
 } talock_t;
 
 typedef struct {
-	struct node *block;
-	
+
 } tacond_t;
 
 
