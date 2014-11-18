@@ -57,21 +57,27 @@ void list_destroy(struct node *head){
 	while (head!=NULL){
 		struct node *tmp=head;
 		head=head->next;
+		free(((tmp->thd)->uc_stack).ss_sp);
+		free(tmp->thd);
 		free(tmp);
+		
 	}
 }
 
 /*  queue helper function end*/
 
 
-struct node *fulllist=NULL;
+struct node *fulllist=NULL;  //all child thread
 struct node *ready=NULL;
-static int waitallreturn=0;
+static int waitallreturn=0;    //help determine the return value of ta_waitall
 
 static ucontext_t main_thread;
 static ucontext_t current_context;
 
 void ta_libinit(void) {
+	//ready=malloc(sizeof(struct node));
+	//ready->next=NULL;
+	//ready->thd=NULL;
 	
     return;
 }
@@ -80,7 +86,7 @@ void ta_libinit(void) {
 
 void ta_create(void (*func)(void *), void *arg) {
 	
-	ucontext_t *ctx;
+	ucontext_t *ctx=NULL;
 	ctx=malloc(sizeof(ucontext_t));
 	unsigned char *stack=(unsigned char*)malloc(STACKSIZE);
 	getcontext(ctx);
@@ -105,12 +111,12 @@ void ta_yield(void) {
 		current_context=*new;
 		
 		swapcontext(&current, new);
-	}else{
+	}/*else{
 		current_context=main_thread;
 		list_append(&current,&ready);
 		swapcontext(&current,&main_thread);
 		
-	}
+	}*/
 	
     return;
 }
@@ -124,6 +130,7 @@ int ta_waitall(void) {
 			swapcontext(&main_thread,new);
 		}
 		list_destroy(fulllist);
+		//free(&main_thread);
 		return waitallreturn==0?0:-1;
 	}
 	
